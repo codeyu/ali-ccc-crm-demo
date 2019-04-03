@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>CCC CRM Integration Demo</title>
+    <link rel="stylesheet" type="text/css" href="//g.alicdn.com/acca/workbench-sdk/0.2.8/main.min.css" />
+    <style>
+        *{
+        margin: 0;
+        padding: 0;
+        }
+        .mini-workbench {
+        position: fixed;
+        border-radius: 100%;
+        height: 50px;
+        line-height: 50px;
+        width: 50px;
+        text-align: center;
+        background: #00c1de;
+        color: white;
+        cursor: pointer;
+        bottom: 44px;
+        right: 100px;
+        }
+
+        .test-call {
+        cursor: pointer;
+        color: #00c1de;
+        }
+
+        #workbench {
+        font-size: 14px;
+        color: #4F5357;
+        position: fixed;
+        width: 280px;
+        background: #FFFFFF;
+        border: 1px solid #D7D8D9;
+        box-shadow: 0 1px 4px 0 rgba(55, 61, 65, 0.14);
+        bottom: 101px;
+        right: 100px;
+        transition: all .3s;
+        }
+
+        #test {
+        position: fixed;
+        width: 265px;
+        background: #FFFFFF;
+        top: 150px;
+        right: 400px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="app">
+    <div onclick="openWorkbench()" class="mini-workbench">
+        云呼
+    </div>
+    <div id="workbench"></div>
+</div>
+
+<h1 th:inline="text">Hello [[${userName}]]</h1>
+
+<p>Click
+    <a th:href="@{/customers}">here</a> to see a customer list.</p>
+
+<hr/>
+
+<p>Aliyun account information</p>
+
+<div th:if="${isAliyunBound} == false">
+    <p>Unavailable</p>
+
+    <p>
+        <a th:href="@{/aliyun/auth}">Retrieval Aliyun Token</a>
+    </p>
+</div>
+<div th:if="${isAliyunBound} == true">
+    <p th:inline="text">Aliyun user name: [[${aliyunUserName}]]</p>
+
+    <p th:inline="text">Token Created Time: [[${createdTime}]]</p>
+
+    <p th:inline="text">Token Expired Time: [[${expiredTime}]]</p>
+
+    <p>
+        <a th:href="@{/aliyun/refresh}">Refresh Aliyun Token</a>
+    </p>
+
+    <p>
+        <a th:href="@{/aliyun/revoke}">Revoke Aliyun Token</a>
+    </p>
+
+</div>
+
+<hr/>
+
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Sign Out"/>
+</form>
+
+<div>
+    <h2 onclick="call()" class="test-call">拨号测试:135012345678</h2>
+    <button onClick="applyBreak()">测试小休</button>
+    <div id="test"></div>
+</div>
+<script type="text/javascript" src="//g.alicdn.com/crm/acc-phone/1.1.0/SIPml-api.js"></script>
+<script type="text/javascript" src="//g.alicdn.com/crm/acc-phone/1.1.0/index.js"></script>
+<script type="text/javascript" src="//g.alicdn.com/acca/workbench-sdk/0.2.8/workbenchSdk.js"></script>
+<script type="text/javascript">
+    !(function (win) {
+      win.workbench = new win.WorkbenchSdk({
+        dom: 'workbench',
+        instanceId: '替换为您呼叫中心的InstanceId',
+        ajaxPath: '/aliyun/ccc/api',
+        ajaxMethod: 'post',
+        header: true,
+        onErrorNotify: function (error) {
+          console.warn(error)
+        },
+        onCallComing: function (aa, bb, cc, dd) {
+          console.log(aa, bb, cc, dd);
+          window.open("https://127.0.0.1:8443/customer/phoneNumber/135012345678")
+        },
+        onCallDialing: function (aa, bb, cc, dd) {
+          console.log(aa, bb, cc, dd);
+        },
+        onStatusChange: function (code, lastCode, context){
+          console.log(code, lastCode, context);
+        }
+
+
+      })
+      //面板展示开关
+      win.workbenchOpen = true;
+      openWorkbench = function () {
+        var workbenchWrapper = document.querySelector("#workbench");
+        var floater = document.querySelector(".mini-workbench");
+        win.workbench.changeVisible(win.workbenchOpen);
+        if (!win.workbenchOpen) {
+          workbenchWrapper.style.display = 'none';
+          floater.innerHTML = '云呼';
+        } else {
+          workbenchWrapper.style.display = 'block';
+          floater.innerHTML = 'X';
+        }
+        win.workbenchOpen = !win.workbenchOpen
+      }
+
+      call = function () {
+        win.workbench.call("135012345678")
+      }
+
+      applyBreak = function () {
+        var yes = prompt("请输入：小休id-小休名称（请不要输入0-default", "1-wc");
+        if(yes){
+          var id = yes.split("-")[0] || 1;
+          var name = yes.split("-")[1] || 'wc';
+          win.workbench.applyForBreak(id, name);
+        }
+      }
+
+    })(window)
+
+</script>
+</body>
+
+</html>

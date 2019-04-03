@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Customer List</title>
+</head>
+
+<body>
+<h1>Customer List</h1>
+
+<div th:if="${not #lists.isEmpty(customers)}">
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Phone Number</th>
+        </tr>
+        <tr th:each="customer : ${customers}">
+            <td>
+                <a th:href="@{/customer/userName/} + ${customer.userName}" th:text="${customer.userName}"/>
+            </td>
+            <td>
+                <a th:href="@{/customer/phoneNumber/} + ${customer.phoneNumber}" th:text="${customer.phoneNumber}"/>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<p>
+    <a href="/">Back to Home</a>
+</p>
+
+</body>
+
+</html>

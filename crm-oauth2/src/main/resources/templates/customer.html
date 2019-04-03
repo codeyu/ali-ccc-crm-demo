@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Customer</title>
+</head>
+
+<body>
+
+<h1 th:inline="text">[[${customer.userName}]]</h1>
+
+<table>
+    <tr>
+        <th>Phone Number</th>
+    </tr>
+    <tr>
+        <td th:text="${customer.phoneNumber}"></td>
+    </tr>
+</table>
+
+
+<p>
+    <a href="/">Back to Home</a>
+</p>
+
+
+</body>
+
+</html>
